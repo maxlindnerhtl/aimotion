@@ -10,10 +10,24 @@ Dieses Projekt zielt darauf ab, die Emotion auf dem Gesicht einer Person in eine
 - OpenCV 4.10
 - Tensorflow 2.18
 
-Libraries können mithilfe von `requirements.txt` durch diesen Befehl installiert werden:
+## Virtuelle Umgebung einrichten
+
+Für das Projekt wird eine eigene virtuelle Python-Umgebung verwendet. Dadurch bleiben die Abhängigkeiten des Projekts von der globalen Python-Installation getrennt.
+
+Erstellen Sie die virtuelle Umgebung mit Python 3.11:
+```bash
+py -3.11 -m venv .venv
+```
+Aktivieren Sie die virtuelle Umgebung:
 
 ```bash
-pip install -r requirements.txt
+.\.venv\Scripts\Activate.ps1
+```
+Nach der Aktivierung sollte (.venv) am Anfang der Kommandozeile angezeigt werden.
+
+Anschließend können die Libraries mithilfe von requirements.txt installiert werden:
+```bash
+pip install -r src\requirements.txt
 ```
 
 ## Grundlegende Nutzung
@@ -21,14 +35,14 @@ pip install -r requirements.txt
 ### Schritt 1: Klonen Sie das Projekt von Git:
 
 ```bash
-https://git.htl-klu.at/sys/2023-24-4xhel-sys/esp32-cam.git
+https://github.com/maxlindnerhtl/aimotion.git
 ```
 
 ### Schritt 2: Navigieren Sie in den Quellordner und führen Sie das Programm aus:
 
 ```bash
 cd src
-python emotions.py --mode display --overlay <pfad-zum-overlay-bild>
+python emotions.py --mode display --overlay overlay.png
 ```
 
 ### Ordnerstruktur
@@ -98,7 +112,7 @@ pyinstaller --onefile --add-data "haarcascade_frontalface_default.xml;." --add-d
 Nach der Ausführung des PyInstaller-Befehls sind einige Anpassungen an der Ordnerstruktur erforderlich:
 
 1. Kopieren Sie die benötigten Dateien aus dem `dist`-Ordner in das übergeordnete Verzeichnis, das Quellverzeichnis:
-   - `emotions.exe`
+  - `emotions.exe`
 2. Löschen Sie den `dist`- und `build`-Ordner, da diese nicht mehr benötigt werden.
 
 #### Endgültige Ordnerstruktur
