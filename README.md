@@ -2,293 +2,367 @@
 
 <img src="assets/demo.gif" width="600" alt="AI-Motion Demo">
 
-*Live-Erkennung der sieben Emotionen über die Webcam*
+AI-Motion is a Python-based computer vision application that detects faces and estimates visible facial expressions in real time. It supports webcam input as well as image and video files.
 
-## Inhaltsverzeichnis
+The application classifies expressions into seven categories:
 
-- [Einführung](#einführung)
-- [Voraussetzungen und Abhängigkeiten](#voraussetzungen-und-abhängigkeiten)
-- [Grundlegende Nutzung](#grundlegende-nutzung)
-  - [Schritt 1: Projekt von Git klonen](#schritt-1-projekt-von-git-klonen)
-  - [Schritt 2: Virtuelle Umgebung einrichten](#schritt-2-virtuelle-umgebung-einrichten)
-  - [Schritt 3: Libraries installieren](#schritt-3-libraries-installieren)
-  - [Schritt 4: Programm ausführen](#schritt-4-programm-ausführen)
-  - [Ordnerstruktur](#ordnerstruktur)
-- [Algorithmus](#algorithmus)
-- [Erstellung einer ausführbaren Datei (.exe)](#erstellung-einer-ausführbaren-datei-exe)
-  - [Anforderungen](#anforderungen)
-  - [Schritt 1: PyInstaller installieren](#schritt-1-pyinstaller-installieren)
-  - [Schritt 2: Projektverzeichnis auswählen](#schritt-2-projektverzeichnis-auswählen)
-  - [Schritt 3: Skript in eine ausführbare Datei umwandeln](#schritt-3-skript-in-eine-ausführbare-datei-umwandeln)
-  - [Schritt 4: Dateien umstrukturieren](#schritt-4-dateien-umstrukturieren)
-  - [Schritt 5: Batch-Datei erstellen](#schritt-5-batch-datei-erstellen)
-- [Fehlerbehebung](#fehlerbehebung)
+- Angry
+- Disgusted
+- Fear
+- Happy
+- Neutral
+- Sad
+- Surprised
 
-## Einführung
+> **Important:** The model estimates facial expressions from visual patterns. It does not reliably determine a person's actual emotional state and should not be used for medical, psychological, employment, or other high-stakes decisions.
 
-Dieses Projekt zielt darauf ab, die Emotion auf dem Gesicht einer Person in eine von **sieben Kategorien** einzuordnen, indem tiefe konvolutionelle neuronale Netze verwendet werden. Das Modell wird auf dem **FER-2013** Datensatz trainiert, der auf der International Conference on Machine Learning (ICML) veröffentlicht wurde. Dieser Datensatz besteht aus 35.887 Graustufen-Bildern von Gesichtern in der Größe 48x48 Pixel mit **sieben Emotionen**: wütend, angewidert, ängstlich, glücklich, neutral, traurig und überrascht.
+## Features
 
-## Voraussetzungen und Abhängigkeiten
+- Real-time expression recognition through a webcam
+- Image and video file input without a camera
+- Configurable runtime settings through `src/config.json`
+- Optional visual overlay
+- Optional confidence display
+- Snapshot capture
+- Video recording
+- Model training support
+- Training metadata for reproducibility
+- Smoke tests and GitHub Actions CI
 
-Für die Verwendung des Projekts werden folgende Voraussetzungen benötigt:
+## How It Works
 
-- Windows
+The application uses:
+
+- **OpenCV** for image capture, face detection, and display
+- **TensorFlow/Keras** for expression classification
+- A convolutional neural network trained on FER-2013-style facial expression data
+- A Haar cascade file for face detection
+
+The processing pipeline is:
+
+1. Capture a frame from a webcam, image, or video.
+2. Detect one or more faces.
+3. Crop and resize each face to 48 × 48 pixels.
+4. Pass the face image to the neural network.
+5. Select the expression with the highest prediction score.
+6. Display the result in the application window.
+
+## Requirements
+
+The documented setup targets:
+
+- Windows 10 or Windows 11
 - Python 3.11
 - Git
-- Webcam
-- pip (Python-Paket-Manager)
+- A webcam, or an image/video file for camera-free usage
+- Internet access for installing Python dependencies
 
-Für das Projekt werden folgende Python-Bibliotheken verwendet:
+Python 3.11 is recommended because it is the version used with the project's TensorFlow setup.
 
-- NumPy 2.0.2
-- argparse 1.4.0
-- Matplotlib 3.9.3
-- OpenCV 4.10.0.84
-- TensorFlow 2.18.0
+## Quick Start on Windows
 
-> **Hinweis:** Für dieses Projekt wird Python 3.11 verwendet, da die verwendete TensorFlow-Version mit dieser Python-Version kompatibel ist. Eine andere Python-Version kann zu Problemen bei der Installation oder Ausführung führen.
+### 1. Clone the repository
 
-## Grundlegende Nutzung
+Open PowerShell and run:
 
-### Schritt 1: Projekt von Git klonen
-
-Öffnen Sie PowerShell und navigieren Sie zunächst zu dem Ordner, in dem das Projekt gespeichert werden soll.
-
-Klonen Sie anschließend das Repository:
-
-```bash
+```powershell
 git clone https://github.com/maxlindnerhtl/aimotion.git
 cd aimotion
 ```
 
-Dadurch wird das Projekt heruntergeladen und ein neuer Ordner `aimotion` erstellt.
+### 2. Verify Python
 
-### Schritt 2: Virtuelle Umgebung einrichten
+Check whether Python 3.11 is available:
 
-Für das Projekt wird eine eigene virtuelle Python-Umgebung verwendet. Dadurch bleiben die Abhängigkeiten des Projekts von der globalen Python-Installation getrennt.
-
-Erstellen Sie die virtuelle Umgebung mit Python 3.11:
-
-```bash
-py -3.11 -m venv .venv
-```
-
-Aktivieren Sie anschließend die virtuelle Umgebung:
-
-```bash
-.\.venv\Scripts\Activate.ps1
-```
-
-Nach der Aktivierung sollte `(.venv)` am Anfang der Kommandozeile angezeigt werden.
-
-> **Hinweis:** Wenn `py -3.11` nicht funktioniert, ist Python 3.11 möglicherweise nicht installiert oder nicht über den Python Launcher verfügbar.
-
-### Schritt 3: Libraries installieren
-
-Stellen Sie sicher, dass die virtuelle Umgebung weiterhin aktiviert ist. Anschließend können die benötigten Libraries mithilfe von `requirements.txt` installiert werden:
-
-```bash
-pip install -r src\requirements.txt
-```
-
-Nach erfolgreicher Installation sollten keine Fehlermeldungen angezeigt werden.
-
-### Schritt 4: Programm ausführen
-
-Navigieren Sie in den Quellordner:
-
-```bash
-cd src
-```
-
-Starten Sie anschließend das Programm:
-
-```bash
-python emotions.py --mode display --overlay overlay.png
-```
-
-Nach dem Start wird die Webcam geöffnet. Erkannte Gesichter werden analysiert und die vorhergesagte Emotion wird im Kamerabild angezeigt.
-
-Das Programm lässt sich durch Betätigen der Taste `Q` beenden. Alternativ kann das Programm durch Schließen des Fensters beendet werden.
-
-### Ordnerstruktur
-
-Nach dem Klonen des Projekts sieht die grundlegende Struktur wie folgt aus:
-```
-aimotion/
-├── README.md
-└── src/
-├── data/
-├── emotions.py
-├── haarcascade_frontalface_default.xml
-├── overlay.png
-├── model.h5
-└── requirements.txt
-```
-
-Dabei befinden sich die für die Anwendung benötigten Python-Dateien, das trainierte Modell, die Haar-Cascade und das Overlay-Bild im Ordner `src`.
-
-## Algorithmus
-
-1. **Gesichtserkennung:** Die **Haar-Cascade**-Methode wird verwendet, um Gesichter in jedem Frame des Webcam-Feeds zu erkennen.
-2. **Bildvorbereitung:** Der Bereich des Bildes, der das Gesicht enthält, wird auf **48x48 Pixel** skaliert und für die Verarbeitung durch das neuronale Netzwerk vorbereitet.
-3. **Emotionserkennung:** Das **CNN (Convolutional Neural Network)** analysiert das vorbereitete Gesicht und gibt eine Liste von **Softmax-Scores** für die sieben Emotionen aus. Die Scores geben an, wie wahrscheinlich das Modell die jeweilige Emotion einschätzt.
-4. **Auswahl der Emotion:** Die Emotion mit dem höchsten Score wird als Vorhersage ausgewählt.
-5. **Anzeige:** Die erkannte Emotion wird anschließend auf dem Bildschirm angezeigt.
-
----
-
-## Erstellung einer ausführbaren Datei (.exe)
-
-Dieser Abschnitt ist optional.
-
-Für die normale Verwendung des Projekts wird keine .exe-Datei benötigt. PyInstaller wird nur verwendet, wenn das Python-Programm als ausführbare Windows-Datei gestartet werden soll, ohne den Python-Befehl jedes Mal manuell ausführen zu müssen.
-
-### Anforderungen
-
-Stellen Sie vor dem Fortfahren sicher, dass folgende Tools und Pakete installiert sind:
-
-- **Python 3.11**
-- **pip** (Python-Paket-Manager)
-- Python-Bibliotheken:
-  - `numpy 2.0.2`
-  - `argparse 1.4.0`
-  - `matplotlib 3.9.3`
-  - `opencv-python 4.10.0.84`
-  - `tensorflow 2.18.0`
-
-Außerdem muss das Projekt bereits eingerichtet und die virtuelle Umgebung aktiviert sein.
-
-### Schritt 1: PyInstaller installieren
-
-Installieren Sie PyInstaller mit folgendem Befehl:
-
-```bash
-pip install pyinstaller
-```
-
-PyInstaller wird verwendet, um das Python-Programm in eine ausführbare .exe-Datei umzuwandeln.
-
-### Schritt 2: Projektverzeichnis auswählen
-
-Navigieren Sie in der Kommandozeile in das Quellverzeichnis Ihres Projekts:
-
-```bash
-cd <projektverzeichnis>/src
-```
-
-Ersetzen Sie `<projektverzeichnis>` durch den tatsächlichen Pfad zu Ihrem Projekt.
-
-### Schritt 3: Skript in eine ausführbare Datei umwandeln
-
-Führen Sie den folgenden PyInstaller-Befehl aus:
-
-```bash
-pyinstaller --onefile --add-data "haarcascade_frontalface_default.xml;." --add-data "overlay.png;." emotions.py
-```
-
-Der Parameter `--onefile` sorgt dafür, dass PyInstaller eine einzelne ausführbare .exe-Datei erstellt.
-
-Die zusätzlichen `--add-data`-Parameter sorgen dafür, dass die für das Programm benötigte Haar-Cascade und das Overlay-Bild in die Anwendung eingebunden werden.
-
-Nach erfolgreicher Ausführung erstellt PyInstaller unter anderem einen `build`- und einen `dist`-Ordner.
-
-### Schritt 4: Dateien umstrukturieren
-
-Nach der Ausführung des PyInstaller-Befehls befindet sich die erstellte `emotions.exe` im `dist`-Ordner.
-
-Kopieren Sie die Datei `emotions.exe` aus dem `dist`-Ordner in das übergeordnete Verzeichnis, also in den Ordner `src`.
-
-Anschließend können der `dist`- und der `build`-Ordner gelöscht werden, da sie für die spätere Verwendung der Anwendung nicht mehr benötigt werden.
-
-PyInstaller erstellt außerdem automatisch die Datei `emotions.spec`. Diese Datei enthält die Konfiguration für den Build und kann für spätere Builds wiederverwendet werden.
-
-#### Endgültige Ordnerstruktur
-```
-aimotion/
-├── README.md
-└── src/
-├── data/
-├── emotions.py
-├── emotions.exe
-├── emotions.spec
-├── images.png
-├── haarcascade_frontalface_default.xml
-├── model.h5
-└── requirements.txt
-```
-
-
-### Schritt 5: Batch-Datei erstellen
-
-Eine `.bat`-Datei kann verwendet werden, um das Programm bequem mit einem Doppelklick zu starten.
-
-Erstellen Sie beispielsweise eine Datei mit dem Namen `start.bat` und fügen Sie folgenden Inhalt ein:
-
-```bat
-@echo off
-cd <projektverzeichnis>/src
-emotions.exe --mode display --overlay overlay.png
-```
-
-Ersetzen Sie `<projektverzeichnis>` durch den tatsächlichen Pfad in Ihrem System.
-
-Die Batch-Datei übernimmt das Wechseln in das richtige Verzeichnis und startet anschließend die Anwendung. Dadurch muss der Startbefehl nicht jedes Mal manuell in PowerShell eingegeben werden.
-
-Speichern Sie die `.bat`-Datei und starten Sie das Programm anschließend durch einen Doppelklick auf diese Datei.
-
-> Das Programm lässt sich durch Betätigen der Taste `Q` beenden. Alternativ kann das Programm durch Schließen des Fensters beendet werden.
-
----
-
-## Fehlerbehebung
-
-### `Python was not found` oder `py -3.11` funktioniert nicht
-
-Stellen Sie sicher, dass **Python 3.11** installiert ist und über den Python Launcher verfügbar ist.
-
-Prüfen Sie die installierte Python-Version mit:
-
-```bash
+```powershell
 py -3.11 --version
 ```
 
-### No module named ...
+### 3. Create a virtual environment
 
-Stellen Sie sicher, dass die virtuelle Umgebung aktiviert ist. In der Kommandozeile sollte `(.venv)` angezeigt werden.
+Create an isolated Python environment in the project directory:
 
-Falls die benötigten Libraries noch nicht installiert wurden, führen Sie erneut folgenden Befehl aus:
+```powershell
+py -3.11 -m venv .venv
+```
 
-```bash
+Activate it:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+After activation, `(.venv)` should appear at the beginning of the PowerShell prompt.
+
+### 4. Install dependencies
+
+With the virtual environment activated, install the required packages:
+
+```powershell
 pip install -r src\requirements.txt
 ```
 
-### Could not load overlay image
+### 5. Start the application
 
-Überprüfen Sie, ob die Datei `overlay.png` im Ordner `src` vorhanden ist und der Dateiname im Startbefehl korrekt geschrieben wurde:
+From the project root, start webcam mode with the default configuration:
 
-```bash
-python emotions.py --mode display --overlay overlay.png
+```powershell
+python .\src\emotions.py --mode display --config .\src\config.json
 ```
 
-### Die Webcam öffnet sich nicht
+Alternatively, run the application from the `src` directory:
 
-Stellen Sie sicher, dass eine Webcam angeschlossen bzw. verfügbar ist und nicht bereits von einer anderen Anwendung verwendet wird.
-
-Überprüfen Sie außerdem, ob Windows der Anwendung den Zugriff auf die Kamera erlaubt.
-
-### Das Programm lässt sich nicht starten
-
-Stellen Sie sicher, dass Sie sich im richtigen Verzeichnis befinden und die virtuelle Umgebung aktiviert ist.
-
-Für die normale Python-Ausführung sollten Sie sich im Ordner `src` befinden:
-
-```bash
+```powershell
 cd src
+python emotions.py --mode display --config config.json
 ```
 
-Anschließend kann das Programm mit folgendem Befehl gestartet werden:
+The application window should open and display the camera feed. Detected faces will be marked and classified expressions will be shown above them.
 
-```bash
-python emotions.py --mode display --overlay overlay.png
+## Keyboard Controls
+
+The controls are available while the application window is focused. A small help bar is displayed along the bottom of the fullscreen window by default.
+
+| Key | Action |
+| --- | --- |
+| `Q` | Quit the application |
+| `O` | Toggle the complete UI overlay, including the decorative image, FPS indicator, and help bar |
+| `C` | Toggle confidence values |
+| `R` | Start or stop video recording |
+| `S` | Save the current frame as a snapshot |
+| `H` | Show or hide the bottom help bar |
+
+Recordings are stored in `src/recordings` by default. Snapshots are stored in `src/snapshots`.
+
+Face rectangles and expression labels remain visible when the UI overlay is disabled because they are the primary recognition output.
+
+## Running Without a Webcam
+
+You can process an image or video file by passing its path through `--input`:
+
+```powershell
+python .\src\emotions.py --mode display --input .\example.mp4
 ```
+
+For an image:
+
+```powershell
+python .\src\emotions.py --mode display --input .\example.png
+```
+
+When processing a video file, the application exits after the final frame. Press `Q` to stop playback early.
+
+## Configuration
+
+Runtime settings are stored in `src/config.json`. This allows common settings to be changed without modifying Python code.
+
+Example:
+
+```json
+{
+  "image_size": 48,
+  "camera_width": 1280,
+  "camera_height": 720,
+  "overlay_enabled": true,
+  "show_confidence": true,
+  "confidence_threshold": 0.45,
+  "face_padding": 0.15,
+  "num_train": 28709,
+  "num_val": 7178,
+  "batch_size": 64,
+  "num_epochs": 50,
+  "recording_dir": "recordings",
+  "snapshot_dir": "snapshots"
+}
+```
+
+Important settings:
+
+- `camera_width` and `camera_height`: Requested webcam resolution. The application uses this fixed resolution during a session; change the values in `config.json` before starting the program.
+- `overlay_enabled`: Whether the overlay is enabled when the application starts.
+- `show_confidence`: Whether prediction confidence values are shown initially.
+- `confidence_threshold`: Minimum confidence required before an expression is displayed.
+- `face_padding`: Additional area included around each detected face.
+- `recording_dir`: Directory for recorded videos.
+- `snapshot_dir`: Directory for saved snapshots.
+- `image_size`: Neural network input size. This should remain `48` unless the model is retrained with a different input size.
+
+You can also use a different configuration file:
+
+```powershell
+python .\src\emotions.py --mode display --config .\my-config.json
+```
+
+## Training the Model
+
+Training data must be available under the expected directory structure in `src/data`:
+
+```text
+src/data/
+├── train/
+│   ├── Angry/
+│   ├── Disgusted/
+│   └── ...
+└── test/
+    ├── Angry/
+    ├── Disgusted/
+    └── ...
+```
+
+Start training with:
+
+```powershell
+python .\src\emotions.py --mode train --config .\src\config.json
+```
+
+After training:
+
+- Model weights are saved to `src/model.h5`.
+- A training plot is saved to `src/plot.png`.
+- Training metadata is saved to `src/artifacts/training_manifest.json`.
+
+Training can take a significant amount of time and may require substantial memory. For normal usage, the included model can be used directly without retraining.
+
+## Project Structure
+
+```text
+aimotion/
+├── .github/
+│   └── workflows/
+│       └── ci.yml
+├── assets/
+│   └── demo.gif
+├── README.md
+├── pytest.ini
+├── src/
+│   ├── artifacts/
+│   ├── config.json
+│   ├── config.py
+│   ├── data/
+│   ├── emotions.py
+│   ├── haarcascade_frontalface_default.xml
+│   ├── model.h5
+│   ├── model_utils.py
+│   ├── overlay.png
+│   ├── reproducibility.py
+│   └── requirements.txt
+├── tests/
+│   ├── test_reproducibility.py
+│   └── test_smoke.py
+└── .venv/
+```
+
+The `.venv` directory is generated locally and is not intended to be committed to version control.
+
+## Testing
+
+Run the smoke tests from the project root:
+
+```powershell
+python -m pytest tests/test_smoke.py -q
+```
+
+Run all current tests:
+
+```powershell
+python -m pytest tests/test_smoke.py tests/test_reproducibility.py -q
+```
+
+GitHub Actions runs the test suite automatically for pull requests and for pushes to the `main` or `master` branches.
+
+## Reproducibility
+
+Each training run creates `src/artifacts/training_manifest.json`. The manifest records:
+
+- Training timestamp
+- Model and training configuration
+- Dataset paths
+- Model path
+- Training and validation history
+- Git commit, when available
+
+This makes it easier to understand how a specific model was produced and to compare future training runs.
+
+## Troubleshooting
+
+### Python 3.11 cannot be found
+
+Run:
+
+```powershell
+py -3.11 --version
+```
+
+If the command fails, install Python 3.11 and ensure that the Python Launcher is available.
+
+### `No module named ...`
+
+Make sure the virtual environment is active. The prompt should start with `(.venv)`. Then reinstall the dependencies:
+
+```powershell
+pip install -r src\requirements.txt
+```
+
+### The webcam does not open
+
+Check that:
+
+- The webcam is connected.
+- No other application is using the webcam.
+- Windows camera permissions allow access.
+- The correct camera index is being used.
+
+You can try another camera index:
+
+```powershell
+python .\src\emotions.py --mode display --camera-index 1
+```
+
+### `model.h5` is missing
+
+The application requires trained model weights. Either restore `src/model.h5` or train a model:
+
+```powershell
+python .\src\emotions.py --mode train --config .\src\config.json
+```
+
+### The overlay cannot be loaded
+
+Check that `src/overlay.png` exists. You can also disable the overlay at startup by setting `"overlay_enabled": false` in `src/config.json`, or press `O` while the application is running.
+
+### PowerShell does not allow script activation
+
+If PowerShell blocks activation scripts, run PowerShell as your user and execute:
+
+```powershell
+Set-ExecutionPolicy -Scope CurrentUser RemoteSigned
+```
+
+Then activate the environment again:
+
+```powershell
+.\.venv\Scripts\Activate.ps1
+```
+
+## Optional: Build a Windows Executable
+
+PyInstaller can package the application as a Windows executable. This is optional; the Python setup above is the recommended development workflow.
+
+Install PyInstaller:
+
+```powershell
+pip install pyinstaller
+```
+
+From the `src` directory, run:
+
+```powershell
+cd src
+pyinstaller --onefile --add-data "haarcascade_frontalface_default.xml;." --add-data "overlay.png;." emotions.py
+```
+
+The executable is created in the `dist` directory. Packaging TensorFlow applications may require additional PyInstaller configuration and should be tested on the target machine.
+
+## Limitations
+
+Expression recognition is sensitive to lighting, camera quality, pose, occlusion, and dataset bias. A confidence score is not a guarantee that the prediction is correct. Treat the output as an experimental estimate rather than an objective measurement of a person's feelings.

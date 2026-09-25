@@ -1,0 +1,15 @@
+{
+  "image_size": 48,
+  "camera_width": 1280,
+  "camera_height": 720,
+  "overlay_enabled": true,
+  "show_confidence": true,
+  "confidence_threshold": 0.45,
+  "face_padding": 0.15,
+  "num_train": 28709,
+  "num_val": 7178,
+  "batch_size": 64,
+  "num_epochs": 50,
+  "recording_dir": "recordings",
+  "snapshot_dir": "snapshots"
+}

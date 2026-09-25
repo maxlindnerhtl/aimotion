@@ -1,0 +1,12 @@
+.venv/
+__pycache__/
+**/__pycache__/
+*.py[cod]
+.pytest_cache/
+.idea/
+*.log
+build/
+dist/
+*.spec
+plot.png
+.DS_Store
